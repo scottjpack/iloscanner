@@ -15,7 +15,7 @@ import netaddr
 #Max Scanning Thread Count
 max_threads = 40
 
-output= []
+output=[]
 
 def test_ip(ip_address, identifier):
         #Identifier is not used
@@ -23,7 +23,7 @@ def test_ip(ip_address, identifier):
         try:
                 socket.inet_aton(IP)
         except:
-                print "%s,invalid IP" % IP
+                #print "%s,invalid IP" % IP
                 return
 
         try:
@@ -35,16 +35,13 @@ def test_ip(ip_address, identifier):
                         firmware_version = re.search("<FWRI>(.*?)<",response_body).group(1)
                 if "PN" in response_body:
                         ilo_version = re.search("<PN>.*\((.*?)\)<",response_body).group(1)
-                #check_vulnerable(IP,ilo_version,firmware_version)
-                #print "%s,%s,%s" % (IP, ilo_version,firmware_version)
-                #output.append("%s,%s,%s" % (IP, ilo_version,firmware_version))
+                check_vulnerable(IP,ilo_version,firmware_version)
 
         except:
-                print "%s,Unresponsive or Not HP iLO" % IP
+                #print "%s,Unresponsive or Not HP iLO" % IP
                 return
 
         check_vulnerable(IP,ilo_version,firmware_version)
-
 
 def usage():
         #Print usage
@@ -55,8 +52,8 @@ def usage():
         print "-i <inputfile>"
         print "inputfile must consist of line-delimited IPv4 Addresses or CIDR ranges."
 
-def print_header():
-        print "ip,ilo_version,firmware_version,heartbleed_vulnerable,bridges_interfaces,ipmi_zero"
+def header():
+        return "ip,ilo_version,firmware_version,heartbleed_vulnerable,bridges_interfaces,ipmi_zero"
 
 def check_vulnerable(IP,ilo,fw):
         ilo_v = ""
@@ -133,8 +130,8 @@ def main():
         count = len(ips)
         dur = 3 + 5 + (count/max_threads)*6
 
-        print "This scan for %s IPs will likely take %s seconds" % (count, dur)
-        print "Starting scan now..."
+        print >> sys.stderr, "This scan for %s IPs will likely take %s seconds" % (count, dur)
+        print >> sys.stderr,  "Starting scan now..."
 
         for IP in ips:
                 t=threading.Thread(target=test_ip,args=(IP,""))
@@ -151,8 +148,7 @@ def main():
                 time.sleep(5)
         time.sleep(5)
 
-
-        print_header()
+        print header()
         for line in output:
                 print line
 
