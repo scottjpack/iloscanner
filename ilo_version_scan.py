@@ -56,7 +56,7 @@ def usage():
         print "inputfile must consist of line-delimited IPv4 Addresses or CIDR ranges."
 
 def print_header():
-        print "ip,ilo_version,firmware_version,heartbleed_vulnerable,bridges_interfaces"
+        print "ip,ilo_version,firmware_version,heartbleed_vulnerable,bridges_interfaces,ipmi_zero"
 
 def check_vulnerable(IP,ilo,fw):
         ilo_v = ""
@@ -77,15 +77,18 @@ def check_vulnerable(IP,ilo,fw):
 
         heartbleed = False
         bridge_interfaces = False
+        ipmi_zero = False
 
         #Heartbleed DOS, http://h20564.www2.hp.com/hpsc/doc/public/display?docId=emr_na-c04249852
         #Versions
-        if (ilo_v==2 and fw_v<3 and fw_sub_v<25) or (ilo_v==1 and fw_v==1 and fw_sub_v<96):
+        if (ilo_v==2 and fw_v==1) or (ilo_v==2 and fw_v==2 and fw_sub_v<25) or (ilo_v==1 and fw_v==1 and fw_sub_v<96):
                 heartbleed = True
         if fw_v==1 and fw_sub_v==30:
                 bridge_interfaces = True
+        if (ilo_v==3 and fw_v<2 and fw_sub_v<61) or (ilo_v==4 and fw_v<2 and fw_sub_v<30):
+                ipmi_zero = True
 
-        output.append("%s,%s,%s,%s,%s" % (IP, ilo, fw, heartbleed, bridge_interfaces))
+        output.append("%s,%s,%s,%s,%s,%s" % (IP, ilo, fw, heartbleed, bridge_interfaces,ipmi_zero))
 
 def main():
         #read IP Addresses to Scan
