@@ -1,5 +1,6 @@
 # iloscanner
 Python Script used for detecting version of HP iLO via HTTPS
+
 Usage:
 ./ilo_version_scan.py -i ip_list
 
